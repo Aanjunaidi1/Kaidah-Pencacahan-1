@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaidah Pencacahan - Interaktif</title>
+    <!-- KaTeX CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" 
+            onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true},{left: '$', right: '$', display: false}]});">
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 24px 30px;
+        }
+        header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        header p {
+            opacity: 0.9;
+            margin-top: 6px;
+            font-size: 16px;
+        }
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            background: #e9edf2;
+            border-bottom: 2px solid #cbd5e1;
+        }
+        .tab-btn {
+            flex: 1 1 auto;
+            padding: 14px 20px;
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn:hover {
+            background: #dce2ea;
+        }
+        .tab-btn.active {
+            background: white;
+            border-bottom-color: #2a5298;
+            color: #1e3c72;
+        }
+        .content {
+            padding: 30px;
+        }
+        .tab-pane {
+            display: none;
+            animation: fade 0.3s ease;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+        @keyframes fade {
+            from { opacity: 0.3; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tab-pane h2 {
+            color: #1e3c72;
+            border-left: 6px solid #2a5298;
+            padding-left: 15px;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .tab-pane h3 {
+            color: #1e3c72;
+            margin: 20px 0 12px 0;
+            font-size: 18px;
+        }
+        .tab-pane p, .tab-pane li {
+            line-height: 1.7;
+            color: #1e293b;
+        }
+        .tab-pane ul {
+            padding-left: 24px;
+            margin: 10px 0;
+        }
+        .card-example {
+            background: #f8fafc;
+            border-left: 4px solid #2a5298;
+            padding: 16px 20px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .card-example strong {
+            color: #1e3c72;
+        }
+        .formula-box {
+            background: #eef2f7;
+            padding: 16px 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 16px 0;
+            font-size: 1.1em;
+        }
+        .quiz-section {
+            margin-top: 30px;
+            border-top: 2px dashed #cbd5e1;
+            padding-top: 24px;
+        }
+        .quiz-section h3 {
+            margin-top: 0;
+        }
+        .question {
+            background: #f1f5f9;
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+        }
+        .question p {
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .question input[type="number"] {
+            padding: 8px 12px;
+            width: 120px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+        .question input[type="number"]:focus {
+            border-color: #2a5298;
+            outline: none;
+        }
+        .question .btn-check {
+            background: #2a5298;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-left: 10px;
+        }
+        .question .btn-check:hover {
+            background: #1e3c72;
+        }
+        .feedback {
+            margin-top: 10px;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        .feedback.correct {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .feedback.wrong {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .feedback.hidden {
+            display: none;
+        }
+        .footer {
+            text-align: center;
+            padding: 16px;
+            background: #e9edf2;
+            color: #475569;
+            font-size: 14px;
+        }
+        @media (max-width: 600px) {
+            .container { border-radius: 10px; }
+            header h1 { font-size: 22px; }
+            .tab-btn { font-size: 14px; padding: 12px 10px; }
+            .content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>📐 Kaidah Pencacahan</h1>
+        <p>Aturan Penjumlahan · Aturan Perkalian · Permutasi</p>
+    </header>
+
+    <!-- Tab Navigation -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="tab1">Aturan Penjumlahan</button>
+        <button class="tab-btn" data-tab="tab2">Aturan Perkalian</button>
+        <button class="tab-btn" data-tab="tab3">Permutasi</button>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <!-- TAB 1: ATURAN PENJUMLAHAN -->
+        <div id="tab1" class="tab-pane active">
+            <h2>Aturan Penjumlahan</h2>
+            <p><strong>Kapan digunakan?</strong> Jika terdapat beberapa pilihan yang <em>saling eksklusif</em> (tidak dapat terjadi bersamaan). Kata kunci: <strong>"atau"</strong>.</p>
+            <div class="formula-box">
+                Jika kejadian A dapat terjadi dengan $m$ cara dan kejadian B dapat terjadi dengan $n$ cara, <br>
+                maka banyak cara untuk kejadian A <strong>atau</strong> B adalah:
+                $$ m + n $$
+            </div>
+            <div class="card-example">
+                <strong>Contoh 1:</strong> Di dalam kotak terdapat 5 pulpen dan 3 pensil. Berapa cara mengambil satu pulpen <strong>atau</strong> satu pensil? <br>
+                <em>Jawab:</em> $5 + 3 = 8$ cara.
+            </div>
+            <div class="card-example">
+                <strong>Contoh 2:</strong> Seorang siswa ingin membeli satu buku. Toko menyediakan 4 buku matematika, 3 fisika, dan 2 biologi. Berapa pilihan buku? <br>
+                <br/>
+                <img src="/Gambar/buku.jpg" 
+         alt="Foto Saya" 
+         style="width: 100%; max-width: 400px; height: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+                <br/><em>Jawab:</em> $4 + 3 + 2 = 9$ pilihan.
+            </div>
+
+            <!-- Latihan -->
+            <div class="quiz-section">
+                <h3>🧪 Latihan Interaktif</h3>
+                <p>Jawablah soal berikut dengan angka, lalu klik "Periksa".</p>
+
+                <div class="question">
+                    <p><strong>Soal 1:</strong> Di sebuah restoran terdapat 5 menu makanan dan 4 menu minuman. Berapa cara memilih satu menu makanan <strong>atau</strong> satu menu minuman?</p>
+                    <input type="number" id="jawab1" placeholder="Jawaban">
+                    <button class="btn-check" onclick="cekJawaban('jawab1', 9, 'feedback1')">Periksa</button>
+                    <div id="feedback1" class="feedback hidden"></div>
+                </div>
+
+                <div class="question">
+                    <p><strong>Soal 2:</strong> Seorang siswa memiliki 3 kaos, 4 kemeja, dan 2 jaket. Berapa cara memilih satu pakaian atas?</p>
+                    <input type="number" id="jawab2" placeholder="Jawaban">
+                    <button class="btn-check" onclick="cekJawaban('jawab2', 9, 'feedback2')">Periksa</button>
+                    <div id="feedback2" class="feedback hidden"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: ATURAN PERKALIAN -->
+        <div id="tab2" class="tab-pane">
+            <h2>Aturan Perkalian</h2>
+            <p><strong>Kapan digunakan?</strong> Jika terdapat kejadian berurutan yang terjadi bersama‐sama. Kata kunci: <strong>"dan"</strong>.</p>
+            <div class="formula-box">
+                Jika kejadian pertama dapat terjadi dengan $m$ cara dan kejadian kedua dengan $n$ cara, <br>
+                maka banyak cara untuk kejadian pertama <strong>dan</strong> kedua adalah:
+                $$ m \times n $$
+                <br>Secara umum untuk $k$ kejadian: $n_1 \times n_2 \times \cdots \times n_k$
+            </div>
+            <div class="card-example">
+                <strong>Contoh 1:</strong> Dari A ke B ada 5 jalan, dari B ke C ada 3 jalan. Berapa cara dari A ke C melalui B? <br>
+                <br>
+                <img src="/Gambar/jalan.png"
+                alt="Foto Saya";
+                style="width: 200%; max-width: 600px; height: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+                <br>
+                <em>Jawab:</em> $5 \times 3 = 15$ cara.
+            </div>
+            <div class="card-example">
+                <strong>Contoh 2:</strong> Ada 5 calon ketua dan 6 calon sekretaris. Berapa pasangan ketua dan sekretaris? <br>
+                <em>Jawab:</em> $5 \times 6 = 30$ pasangan.
+            </div>
+
+            <!-- Latihan -->
+            <div class="quiz-section">
+                <h3>🧪 Latihan Interaktif</h3>
+                <div class="question">
+                    <p><strong>Soal 1:</strong> Fikry mempunyai 5 baju dan 3 celana. Berapa pasangan baju dan celana yang dapat dipakai?</p>
+                    <input type="number" id="jawab3" placeholder="Jawaban">
+                    <button class="btn-check" onclick="cekJawaban('jawab3', 15, 'feedback3')">Periksa</button>
+                    <div id="feedback3" class="feedback hidden"></div>
+                </div>
+                <div class="question">
+                    <p><strong>Soal 2:</strong> Dari angka 2, 3, 5, 7, 8 akan dibuat bilangan 3 angka berbeda. Berapa banyak bilangan yang dapat terbentuk?</p>
+                    <input type="number" id="jawab4" placeholder="Jawaban">
+                    <button class="btn-check" onclick="cekJawaban('jawab4', 60, 'feedback4')">Periksa</button>
+                    <div id="feedback4" class="feedback hidden"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: PERMUTASI -->
+        <div id="tab3" class="tab-pane">
+            <h2>Permutasi</h2>
+            <p><strong>Permutasi</strong> adalah susunan objek dengan <strong>memperhatikan urutan</strong>. $AB \neq BA$.</p>
+            <div class="formula-box">
+                Faktorial: $$ n! = n \times (n-1) \times \cdots \times 1 $$ dengan $0! = 1$.
+                <br><br>
+                Permutasi $r$ unsur dari $n$ unsur berbeda:
+                $$ P(n, r) = \frac{n!}{(n-r)!} = n \times (n-1) \times \cdots \times (n-r+1) $$
+                <br>
+                Jika seluruh $n$ unsur digunakan: $P(n, n) = n!$
+                <br><br>
+                Jika ada unsur yang sama (misal $k_1, k_2, \dots$):
+                $$ P = \frac{n!}{k_1! \cdot k_2! \cdot \dots} $$
+            </div>
+            <div class="card-example">
+                <strong>Contoh 1:</strong> Berapa susunan 2 huruf dari A, B, C, D? <br>
+                <em>Jawab:</em> $P(4,2) = 4 \times 3 = 12$ susunan.
+            </div>
+            <div class="card-example">
+                <strong>Contoh 2:</strong> Berapa susunan huruf dari kata "BACA"? (A muncul 2 kali) <br>
+                <em>Jawab:</em> $\frac{4!}{2!} = 12$ susunan.
+            </div>
+
+            <!-- Latihan -->
+            <div class="quiz-section">
+                <h3>🧪 Latihan Interaktif</h3>
+                <div class="question">
+                    <p><strong>Soal 1:</strong> Berapa banyak susunan duduk 4 orang pada 4 kursi berjajar?</p>
+                    <input type="number" id="jawab5" placeholder="Jawaban">
+                    <button class="btn-check" onclick="cekJawaban('jawab5', 24, 'feedback5')">Periksa</button>
+                    <div id="feedback5" class="feedback hidden"></div>
+                </div>
+                <div class="question">
+                    <p><strong>Soal 2:</strong> Dalam perlombaan 10 peserta, berapa kemungkinan juara 1, 2, dan 3?</p>
+                    <input type="number" id="jawab6" placeholder="Jawaban">
+                    <button class="btn-check" onclick="cekJawaban('jawab6', 720, 'feedback6')">Periksa</button>
+                    <div id="feedback6" class="feedback hidden"></div>
+                </div>
+                <div class="question">
+                    <p><strong>Soal 3:</strong> Berapa susunan huruf dari kata "KAKAK"? (K=3, A=2)</p>
+                    <input type="number" id="jawab7" placeholder="Jawaban">
+                    <button class="btn-check" onclick="cekJawaban('jawab7', 10, 'feedback7')">Periksa</button>
+                    <div id="feedback7" class="feedback hidden"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Media Belajar Interaktif · Kaidah Pencacahan · Matematika SMA Fase F
+    </div>
+</div>
+
+<script>
+    // Tab switching
+    const tabs = document.querySelectorAll('.tab-btn');
+    const panes = document.querySelectorAll('.tab-pane');
+
+    tabs.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove active class from all tabs and panes
+            tabs.forEach(b => b.classList.remove('active'));
+            panes.forEach(p => p.classList.remove('active'));
+
+            // Activate clicked tab
+            btn.classList.add('active');
+            const target = document.getElementById(btn.dataset.tab);
+            if (target) target.classList.add('active');
+
+            // Re-render KaTeX after switching (auto-render might not catch new content)
+            if (window.renderMathInElement) {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ]
+                });
+            }
+        });
+    });
+
+    // Function to check answer
+    function cekJawaban(inputId, jawabanBenar, feedbackId) {
+        const input = document.getElementById(inputId);
+        const feedback = document.getElementById(feedbackId);
+        const nilai = parseInt(input.value);
+
+        feedback.classList.remove('hidden', 'correct', 'wrong');
+
+        if (isNaN(nilai)) {
+            feedback.textContent = '❌ Masukkan angka terlebih dahulu!';
+            feedback.className = 'feedback wrong';
+            return;
+        }
+
+        if (nilai === jawabanBenar) {
+            feedback.textContent = '✅ Benar! Jawaban tepat.';
+            feedback.className = 'feedback correct';
+        } else {
+            feedback.textContent = `❌ Salah. Coba lagi! (Petunjuk: jawabannya ${jawabanBenar})`;
+            feedback.className = 'feedback wrong';
+        }
+    }
+
+    // Initial KaTeX render after page load (auto-render handles it, but we can force)
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.renderMathInElement) {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+        }
+    });
+</script>
+</body>
+</html>
