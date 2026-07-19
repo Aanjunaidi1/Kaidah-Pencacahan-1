@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kuis Kaidah Pencacahan • Auto-Spreadsheet</title>
+    <style>
+        /* ===== RESET & DARK THEME ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: #0b0f1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: background 0.3s;
+            color: #e2e8f0;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: #141b2b;
+            border-radius: 28px;
+            padding: 32px 35px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            border: 1px solid #2a3650;
+            transition: 0.3s;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ===== LOGIN ===== */
+        #loginPage {
+            text-align: center;
+        }
+        #loginPage h1 {
+            font-size: 2.4rem;
+            background: linear-gradient(135deg, #818cf8, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        #loginPage p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            max-width: 360px;
+            margin: 18px auto;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 18px;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 14px;
+            color: #f1f5f9;
+            font-size: 1rem;
+            transition: 0.3s;
+            appearance: auto;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #818cf8;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25);
+        }
+        .form-group select option {
+            background: #1e293b;
+            color: #f1f5f9;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            padding: 16px 48px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+        .btn-primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== QUIZ HEADER ===== */
+        #quizHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #2a3650;
+        }
+        #quizHeader h2 {
+            font-size: 1.6rem;
+            color: #e2e8f0;
+        }
+        #timerDisplay {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fcd34d;
+            background: #1e293b;
+            padding: 6px 22px;
+            border-radius: 40px;
+            border: 1px solid #fcd34d44;
+            font-variant-numeric: tabular-nums;
+        }
+        #timerDisplay.warning {
+            color: #f87171;
+            border-color: #f8717188;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* ===== SOAL ===== */
+        .soal {
+            background: #1a2336;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 18px;
+            border-left: 5px solid #4f46e5;
+            transition: 0.2s;
+        }
+        .soal .nomor {
+            font-weight: 700;
+            color: #818cf8;
+            margin-right: 10px;
+        }
+        .soal .pertanyaan {
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin-bottom: 14px;
+            color: #f1f5f9;
+        }
+        .soal .opsi {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 22px;
+            align-items: center;
+        }
+        .soal .opsi label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: #cbd5e1;
+            transition: 0.2s;
+        }
+        .soal .opsi label:hover {
+            color: #e2e8f0;
+        }
+        .soal input[type="radio"],
+        .soal input[type="text"] {
+            transform: scale(1.1);
+            accent-color: #818cf8;
+        }
+        .soal input[type="text"] {
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #f1f5f9;
+            font-size: 1rem;
+            width: 150px;
+            transition: 0.3s;
+        }
+        .soal input[type="text"]:focus {
+            border-color: #818cf8;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        .soal .truefalse-group {
+            display: flex;
+            gap: 28px;
+        }
+        .soal .truefalse-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== SUBMIT ===== */
+        #submitQuiz {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 18px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+        #submitQuiz:hover:not(:disabled) {
+            transform: scale(1.01);
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.3);
+        }
+        #submitQuiz:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== RESULT ===== */
+        #resultPage {
+            text-align: center;
+        }
+        #resultPage .done-message {
+            background: #1e293b;
+            padding: 12px 20px;
+            border-radius: 40px;
+            display: inline-block;
+            color: #fcd34d;
+            font-weight: 600;
+            border: 1px solid #fcd34d44;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        .status-send {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 600;
+            background: #1e293b;
+        }
+        .status-send.success { color: #34d399; border: 1px solid #34d39944; }
+        .status-send.error { color: #f87171; border: 1px solid #f8717144; }
+        .status-send.sending { color: #fcd34d; border: 1px solid #fcd34d44; }
+
+        #resultPage h2 {
+            font-size: 2.2rem;
+            color: #e2e8f0;
+        }
+        .skor-angka {
+            font-size: 4.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #818cf8, #4f46e5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            padding: 10px 30px;
+            background-color: #1e293b;
+            border-radius: 60px;
+            margin: 16px 0;
+            border: 2px solid #4f46e5;
+        }
+        .detail {
+            background: #1a2336;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 18px 0;
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            border: 1px solid #2a3650;
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .btn-secondary {
+            background: #334155;
+            color: #e2e8f0;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        /* ===== FULLSCREEN WARNING OVERLAY ===== */
+        #fullscreenWarning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #fullscreenWarning .warning-box {
+            background: #1a2336;
+            padding: 36px 44px;
+            border-radius: 28px;
+            max-width: 480px;
+            text-align: center;
+            border: 1px solid #4f46e5;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+        }
+        #fullscreenWarning .warning-box h3 {
+            font-size: 2rem;
+            color: #f87171;
+            margin-bottom: 10px;
+        }
+        #fullscreenWarning .warning-box p {
+            font-size: 1.05rem;
+            color: #cbd5e1;
+            margin: 12px 0;
+        }
+        #fullscreenWarning .warning-box .timer-big {
+            font-size: 3.2rem;
+            font-weight: 800;
+            color: #fcd34d;
+            margin: 10px 0;
+        }
+        #fullscreenWarning .warning-box .btn-back {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 12px;
+        }
+        #fullscreenWarning .warning-box .btn-back:hover {
+            background: #6366f1;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .container { padding: 20px 16px; }
+            #loginPage h1 { font-size: 1.8rem; }
+            .soal { padding: 16px 18px; }
+            .soal .opsi { flex-direction: column; align-items: flex-start; gap: 6px; }
+            .soal .truefalse-group { flex-direction: column; gap: 4px; }
+            #quizHeader { flex-direction: column; align-items: stretch; gap: 12px; }
+            #timerDisplay { text-align: center; }
+            .skor-angka { font-size: 3.6rem; }
+            .btn-group { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== FULLSCREEN WARNING ===== -->
+<div id="fullscreenWarning">
+    <div class="warning-box">
+        <h3>⛔ Keluar dari Layar Penuh</h3>
+        <p>Anda keluar dari mode <strong>full screen</strong>.</p>
+        <p>Kembalikan dalam <strong><span id="countdownTimer">10</span> detik</strong>, atau kuis akan berakhir.</p>
+        <div class="timer-big" id="timerWarning">10</div>
+        <button class="btn-back" id="btnBackFullscreen">↩ Kembali ke Full Screen</button>
+    </div>
+</div>
+
+<!-- ===== KONTAINER UTAMA ===== -->
+<div class="container" id="appContainer">
+
+    <!-- LOGIN -->
+    <div id="loginPage">
+        <h1>📐 Kuis Kaidah Pencacahan</h1>
+        <p>Aturan Penjumlahan · Perkalian · Permutasi</p>
+        <div class="form-group">
+            <label for="namaInput">Nama Lengkap</label>
+            <input type="text" id="namaInput" placeholder="Masukkan nama Anda" required />
+        </div>
+        <div class="form-group">
+            <label for="kelasSelect">Kelas</label>
+            <select id="kelasSelect" required>
+                <option value="">-- Pilih Kelas --</option>
+                <option value="12.1">12.1</option>
+                <option value="12.2">12.2</option>
+                <option value="12.3">12.3</option>
+            </select>
+        </div>
+        <button class="btn-primary" id="btnStart">🚀 Mulai Kuis</button>
+        <p style="margin-top: 18px; color: #64748b; font-size: 0.9rem;">* Mode layar penuh wajib • 5 menit • hanya sekali</p>
+    </div>
+
+    <!-- QUIZ -->
+    <div id="quizPage" class="hidden">
+        <div id="quizHeader">
+            <h2>📝 Soal Kuis</h2>
+            <div id="timerDisplay">05:00</div>
+        </div>
+        <div id="soalContainer"></div>
+        <button id="submitQuiz">📨 Kirim Jawaban</button>
+    </div>
+
+    <!-- RESULT -->
+    <div id="resultPage" class="hidden">
+        <div class="done-message">✅ Anda sudah selesai mengerjakan Kuis ini</div>
+        <h2>🏆 Hasil Kuis</h2>
+        <div class="skor-angka" id="skorAkhir">0</div>
+        <p style="color: #94a3b8; font-size: 1.1rem;">Nilai (0–100)</p>
+        <div class="detail">
+            <p><strong>Nama:</strong> <span id="resultNama">-</span></p>
+            <p><strong>Kelas:</strong> <span id="resultKelas">-</span></p>
+        </div>
+        
+        <!-- Status pengiriman data ke spreadsheet -->
+        <div id="statusSpreadsheet" class="status-send sending">⏳ Mengirim data ke spreadsheet ...</div>
+        
+        <div class="btn-group">
+            <button class="btn-secondary" id="btnClose">✕ Tutup</button>
+        </div>
+        <p style="margin-top: 14px; color: #64748b; font-size: 0.85rem;">
+            * Data nilai otomatis tersimpan di Google Sheets Anda.
+        </p>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    //  🔥 GANTI URL INI DENGAN URL APPS SCRIPT ANDA
+    // ============================================================
+    const GOOGLE_SHEETS_WEBAPP_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL';
+
+    // ============================================================
+    //  DATA SOAL (10 soal)
+    // ============================================================
+    const soalData = [
+        {
+            type: 'mcq',
+            question: 'Aturan penjumlahan: Di dalam kotak terdapat 5 pulpen dan 3 pensil. Berapa cara mengambil satu pulpen ATAU satu pensil?',
+            options: ['2', '8', '15', '5', '3'],
+            correct: '8'
+        },
+        {
+            type: 'mcq',
+            question: 'Aturan perkalian: Dari kota A ke B ada 5 jalan, dari B ke C ada 3 jalan. Berapa cara dari A ke C melalui B?',
+            options: ['5', '3', '8', '15', '30'],
+            correct: '15'
+        },
+        {
+            type: 'mcq',
+            question: 'Permutasi: Berapa banyak susunan 2 huruf yang dapat dibentuk dari 4 huruf berbeda (A, B, C, D)?',
+            options: ['4', '6', '12', '24', '16'],
+            correct: '12'
+        },
+        {
+            type: 'mcq',
+            question: 'Permutasi dengan unsur sama: Berapa banyak susunan huruf dari kata "BACA"?',
+            options: ['4', '6', '12', '24', '8'],
+            correct: '12'
+        },
+        {
+            type: 'mcq',
+            question: 'HOTS: Dari angka 0, 1, 2, 3, 4, 5 akan disusun bilangan 3 angka berbeda. Berapa banyak bilangan yang nilainya lebih dari 300?',
+            options: ['60', '72', '80', '90', '100'],
+            correct: '60'
+        },
+        {
+            type: 'truefalse',
+            question: 'Aturan penjumlahan digunakan untuk kejadian yang terjadi secara bersamaan ("dan").',
+            correct: 'false'
+        },
+        {
+            type: 'truefalse',
+            question: 'Faktorial dari 0! = 1.',
+            correct: 'true'
+        },
+        {
+            type: 'fill',
+            question: 'Berapa banyak susunan duduk 4 orang pada 4 kursi berjajar? (tulis angka)',
+            correct: '24'
+        },
+        {
+            type: 'fill',
+            question: 'Berapa banyak susunan huruf dari kata "KAKAK"? (tulis angka)',
+            correct: '10'
+        },
+        {
+            type: 'fill',
+            question: 'Dari angka 2, 3, 5, 7, 8 akan dibuat bilangan 3 angka berbeda. Berapa banyak bilangan yang dapat terbentuk? (tulis angka)',
+            correct: '60'
+        }
+    ];
+
+    // ============================================================
+    //  VARIABEL GLOBAL
+    // ============================================================
+    let nama = '';
+    let kelas = '';
+    let skor = 0;
+    let nilai = 0;
+    let timerInterval = null;
+    let timeLeft = 300;
+    let quizFinished = false;
+    let warningInterval = null;
+    let warningActive = false;
+
+    // DOM
+    const loginPage = document.getElementById('loginPage');
+    const quizPage = document.getElementById('quizPage');
+    const resultPage = document.getElementById('resultPage');
+    const soalContainer = document.getElementById('soalContainer');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const btnStart = document.getElementById('btnStart');
+    const btnSubmit = document.getElementById('submitQuiz');
+    const btnClose = document.getElementById('btnClose');
+    const namaInput = document.getElementById('namaInput');
+    const kelasSelect = document.getElementById('kelasSelect');
+    const fullscreenWarning = document.getElementById('fullscreenWarning');
+    const timerWarning = document.getElementById('timerWarning');
+    const countdownTimer = document.getElementById('countdownTimer');
+    const btnBackFullscreen = document.getElementById('btnBackFullscreen');
+    const statusSpreadsheet = document.getElementById('statusSpreadsheet');
+
+    // ============================================================
+    //  FUNGSI KIRIM KE SPREADSHEET (OTOMATIS)
+    // ============================================================
+    function sendToSpreadsheet(nama, kelas, nilai, skor) {
+        const data = {
+            nama: nama,
+            kelas: kelas,
+            nilai: nilai,
+            skor: skor,
+            tanggal: new Date().toLocaleString('id-ID', { hour12: false })
+        };
+
+        // Tampilkan status "mengirim"
+        statusSpreadsheet.className = 'status-send sending';
+        statusSpreadsheet.textContent = '⏳ Mengirim data ke spreadsheet ...';
+
+        fetch('https://script.google.com/macros/s/AKfycbxEkgZuQi-J-KkwPJG77DYISSodODn0xXJ70pUzoxraJtXyICTaiklwA4sD1gI7GL8/exec', {
+            method: 'POST',
+            mode: 'no-cors', // karena kita tidak butuh response detail dari Apps Script (agar tidak error CORS)
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            // Karena mode 'no-cors', response opaque, kita anggap sukses
+            statusSpreadsheet.className = 'status-send success';
+            statusSpreadsheet.textContent = '✅ Data nilai berhasil dikirim ke Google Spreadsheet!';
+        })
+        .catch(err => {
+            statusSpreadsheet.className = 'status-send error';
+            statusSpreadsheet.textContent = `❌ Gagal mengirim: ${err.message}. Coba cek URL Apps Script.`;
+            console.error('Error sending to spreadsheet:', err);
+        });
+    }
+
+    // ============================================================
+    //  FUNGSI RENDER SOAL
+    // ============================================================
+    function renderSoal() {
+        let html = '';
+        soalData.forEach((soal, idx) => {
+            const nomor = idx + 1;
+            html += `<div class="soal" data-index="${idx}">`;
+            html += `<div class="pertanyaan"><span class="nomor">${nomor}.</span> ${soal.question}</div>`;
+
+            if (soal.type === 'mcq') {
+                html += `<div class="opsi">`;
+                soal.options.forEach((opt) => {
+                    html += `<label>
+                        <input type="radio" name="q${idx}" value="${opt}"> ${opt}
+                    </label>`;
+                });
+                html += `</div>`;
+            } else if (soal.type === 'truefalse') {
+                html += `<div class="opsi truefalse-group">
+                    <label><input type="radio" name="q${idx}" value="true"> Benar</label>
+                    <label><input type="radio" name="q${idx}" value="false"> Salah</label>
+                </div>`;
+            } else if (soal.type === 'fill') {
+                html += `<div class="opsi">
+                    <input type="text" id="fill_${idx}" placeholder="Tulis angka" autocomplete="off" />
+                </div>`;
+            }
+            html += `</div>`;
+        });
+        soalContainer.innerHTML = html;
+    }
+
+    // ============================================================
+    //  FUNGSI HITUNG SKOR & NILAI
+    // ============================================================
+    function hitungSkor() {
+        let benar = 0;
+        soalData.forEach((soal, idx) => {
+            let jawabanUser = '';
+            if (soal.type === 'mcq' || soal.type === 'truefalse') {
+                const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+                jawabanUser = selected ? selected.value : '';
+            } else if (soal.type === 'fill') {
+                const input = document.getElementById(`fill_${idx}`);
+                jawabanUser = input ? input.value.trim() : '';
+            }
+            if (jawabanUser === soal.correct) benar++;
+        });
+        return benar;
+    }
+
+    // ============================================================
+    //  FUNGSI SELESAI KUIS (Kirim Otomatis ke Spreadsheet)
+    // ============================================================
+    function finishQuiz(force = false) {
+        if (quizFinished) return;
+        quizFinished = true;
+
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        document.querySelectorAll('#soalContainer input, #soalContainer textarea').forEach(el => el.disabled = true);
+        btnSubmit.disabled = true;
+
+        skor = hitungSkor();
+        nilai = Math.round((skor / 10) * 100);
+
+        // Tampilkan hasil di UI
+        quizPage.classList.add('hidden');
+        resultPage.classList.remove('hidden');
+        document.getElementById('skorAkhir').textContent = nilai;
+        document.getElementById('resultNama').textContent = nama;
+        document.getElementById('resultKelas').textContent = kelas;
+
+        // --- KIRIM OTOMATIS KE SPREADSHEET ---
+        sendToSpreadsheet(nama, kelas, nilai, skor);
+
+        // Simpan di sessionStorage agar tidak bisa diulang
+        sessionStorage.setItem('kuis_selesai', 'true');
+        sessionStorage.setItem('kuis_nama', nama);
+        sessionStorage.setItem('kuis_kelas', kelas);
+        sessionStorage.setItem('kuis_nilai', nilai);
+
+        // Fullscreen cleanup
+        if (isFullscreen()) exitFullscreen();
+        document.removeEventListener('fullscreenchange', handleFullscreenChange);
+        document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+        hideFullscreenWarning();
+    }
+
+    // ============================================================
+    //  TIMER
+    // ============================================================
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            updateTimerDisplay();
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                finishQuiz(true);
+                alert('⏰ Waktu habis! Kuis berakhir.');
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        if (timeLeft <= 30) {
+            timerDisplay.classList.add('warning');
+        } else {
+            timerDisplay.classList.remove('warning');
+        }
+    }
+
+    // ============================================================
+    //  FULLSCREEN HANDLING
+    // ============================================================
+    function isFullscreen() {
+        return !!(document.fullscreenElement || document.webkitFullscreenElement);
+    }
+
+    function requestFullscreen() {
+        const el = document.documentElement;
+        if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    }
+
+    function exitFullscreen() {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+
+    function showFullscreenWarning() {
+        if (warningActive || quizFinished) return;
+        warningActive = true;
+        fullscreenWarning.style.display = 'flex';
+        let timeLeftWarning = 10;
+        timerWarning.textContent = timeLeftWarning;
+        countdownTimer.textContent = timeLeftWarning;
+
+        if (warningInterval) clearInterval(warningInterval);
+        warningInterval = setInterval(() => {
+            timeLeftWarning--;
+            timerWarning.textContent = timeLeftWarning;
+            countdownTimer.textContent = timeLeftWarning;
+            if (timeLeftWarning <= 0) {
+                clearInterval(warningInterval);
+                warningInterval = null;
+                finishQuiz(true);
+                alert('⏰ Keluar dari full screen terlalu lama! Kuis berakhir.');
+            }
+        }, 1000);
+    }
+
+    function hideFullscreenWarning() {
+        if (warningInterval) {
+            clearInterval(warningInterval);
+            warningInterval = null;
+        }
+        fullscreenWarning.style.display = 'none';
+        warningActive = false;
+    }
+
+    function handleFullscreenChange() {
+        if (!isFullscreen() && quizPage.classList.contains('hidden') === false && !quizFinished) {
+            showFullscreenWarning();
+        } else {
+            if (warningActive) {
+                hideFullscreenWarning();
+            }
+        }
+    }
+
+    // ============================================================
+    //  EVENT LISTENERS
+    // ============================================================
+
+    // 1. Mulai kuis
+    btnStart.addEventListener('click', function () {
+        nama = namaInput.value.trim();
+        kelas = kelasSelect.value;
+        if (nama === '' || kelas === '') {
+            alert('Nama dan Kelas wajib diisi!');
+            return;
+        }
+
+        if (sessionStorage.getItem('kuis_selesai') === 'true') {
+            alert('Anda sudah mengerjakan kuis ini!');
+            const savedNama = sessionStorage.getItem('kuis_nama') || nama;
+            const savedKelas = sessionStorage.getItem('kuis_kelas') || kelas;
+            const savedNilai = parseInt(sessionStorage.getItem('kuis_nilai')) || 0;
+            loginPage.classList.add('hidden');
+            quizPage.classList.add('hidden');
+            resultPage.classList.remove('hidden');
+            document.getElementById('skorAkhir').textContent = savedNilai;
+            document.getElementById('resultNama').textContent = savedNama;
+            document.getElementById('resultKelas').textContent = savedKelas;
+            // Tampilkan status bahwa data sudah dikirim sebelumnya
+            statusSpreadsheet.className = 'status-send success';
+            statusSpreadsheet.textContent = '✅ Data Anda sudah tersimpan di spreadsheet sebelumnya.';
+            return;
+        }
+
+        loginPage.classList.add('hidden');
+        quizPage.classList.remove('hidden');
+        renderSoal();
+        updateTimerDisplay();
+        startTimer();
+        requestFullscreen();
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    });
+
+    // 2. Kembali ke full screen
+    btnBackFullscreen.addEventListener('click', function () {
+        requestFullscreen();
+    });
+
+    // 3. Submit kuis
+    btnSubmit.addEventListener('click', function () {
+        if (quizFinished) return;
+        let semuaTerjawab = true;
+        soalData.forEach((soal, idx) => {
+            if (soal.type === 'mcq' || soal.type === 'truefalse') {
+                const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+                if (!selected) semuaTerjawab = false;
+            } else if (soal.type === 'fill') {
+                const input = document.getElementById(`fill_${idx}`);
+                if (input.value.trim() === '') semuaTerjawab = false;
+            }
+        });
+        if (!semuaTerjawab) {
+            if (!confirm('Masih ada soal yang belum dijawab. Yakin ingin submit?')) {
+                return;
+            }
+        }
+        finishQuiz();
+    });
+
+    // 4. Tutup (reload)
+    btnClose.addEventListener('click', function () {
+        window.location.reload();
+    });
+
+    // ============================================================
+    //  INISIALISASI
+    // ============================================================
+    window.addEventListener('load', function () {
+        if (sessionStorage.getItem('kuis_selesai') === 'true') {
+            loginPage.classList.add('hidden');
+            quizPage.classList.add('hidden');
+            resultPage.classList.remove('hidden');
+            document.getElementById('skorAkhir').textContent = sessionStorage.getItem('kuis_nilai') || 0;
+            document.getElementById('resultNama').textContent = sessionStorage.getItem('kuis_nama') || '-';
+            document.getElementById('resultKelas').textContent = sessionStorage.getItem('kuis_kelas') || '-';
+            statusSpreadsheet.className = 'status-send success';
+            statusSpreadsheet.textContent = '✅ Data Anda sudah tersimpan di spreadsheet sebelumnya.';
+        }
+    });
+
+    console.log('✅ Kuis siap! Data akan otomatis dikirim ke Google Sheets saat submit.');
+</script>
+</body>
+</html>
